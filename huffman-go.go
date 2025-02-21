@@ -1,4 +1,4 @@
-package main
+package huffmango
 
 import (
 	"fmt"
@@ -106,8 +106,4 @@ func CreateHuffmanCodeFromString(s string) {
 	}
 
 	printCode(nodes[0], []int{})
-}
-
-func main() {
-	CreateHuffmanCodeFromString("fljkashfkjlshagdfjkhsdkjfghsdaghfksdghfkhsdfjkhsadjkfhskdjfhjkasdhfjklasdfghjlaskdfgaskldjhfgasdjkhlfgasdjklhfgsadjklhf")
 }

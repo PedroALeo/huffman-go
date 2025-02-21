@@ -1,4 +1,4 @@
-package huffmango
+package main
 
 import (
 	"fmt"
@@ -43,15 +43,13 @@ func printCode(root node, steps []int) {
 	}
 
 	if root.left != nil {
-		leftSteps := steps
-		leftSteps = append(leftSteps, 0)
-		printCode(*root.left, leftSteps)
+		steps = append(steps, 0)
+		printCode(*root.left, steps)
 	}
 
 	if root.right != nil {
-		rightSteps := steps
-		rightSteps = append(rightSteps, 1)
-		printCode(*root.right, rightSteps)
+		steps = append(steps[:len(steps)-1], 1)
+		printCode(*root.right, steps)
 	}
 }
 
@@ -104,8 +102,12 @@ func CreateHuffmanCodeFromString(s string) {
 	nodes := makeNodes(s)
 
 	for len(nodes) > 1 {
-		iteration(nodes)
+		nodes = iteration(nodes)
 	}
 
 	printCode(nodes[0], []int{})
+}
+
+func main() {
+	CreateHuffmanCodeFromString("fljkashfkjlshagdfjkhsdkjfghsdaghfksdghfkhsdfjkhsadjkfhskdjfhjkasdhfjklasdfghjlaskdfgaskldjhfgasdjkhlfgasdjklhfgsadjklhf")
 }

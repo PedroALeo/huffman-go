@@ -5,31 +5,32 @@ import (
 	"strconv"
 )
 
-type node struct {
-	char        string
-	freq        int
-	left, right *node
-}
+func CompressWithMapCode(mapCode map[rune]string, originalString string) ([]byte, int) {
+	var strEncodedString string
 
-func makeNodes(s string) []node {
-	var nodes []node
-	m := make(map[string]int)
-
-	for _, v := range s {
-		m[string(v)] += 1
+	for _, rune := range originalString {
+		strEncodedString += mapCode[rune]
 	}
 
-	fmt.Printf("%v\n", m)
+	println(strEncodedString)
 
-	for char, freq := range m {
-		nodes = append(nodes, node{char: char, freq: freq})
-	}
+	encodedStr := binaryStringToByteSlice(strEncodedString)
 
-	return nodes
+	return encodedStr, len(originalString)
 }
 
-func (n *node) isLeaf() bool {
-	return (n.left == nil) && (n.right == nil)
+func PrintCompressWithMapCode(mapCode map[rune]string, originalString string) {
+	var strEncodedString string
+
+	for _, rune := range originalString {
+		strEncodedString += mapCode[rune]
+	}
+
+	println(strEncodedString)
+
+	encodedStr := binaryStringToByteSlice(strEncodedString)
+
+	fmt.Printf("%v\n", encodedStr)
 }
 
 func printCode(root node, steps []int) {
@@ -53,52 +54,42 @@ func printCode(root node, steps []int) {
 	}
 }
 
-func removeAtIndex(nodes []node, index int) []node {
-	return append(nodes[:index], nodes[index+1:]...)
-}
-
-func newInternalNode(node1, node2 node) node {
-	return node{
-		char:  "Internal node",
-		freq:  node1.freq + node2.freq,
-		left:  &node1,
-		right: &node2,
-	}
-}
-
-func findLowestFreq(nodes []node) int {
-	lf := nodes[0].freq
-	ci := 0
-
-	for i, node := range nodes {
-		if node.freq < lf {
-			lf = node.freq
-			ci = i
+func fillMapCode(root node, steps []int, mapCode map[rune]string) {
+	if root.isLeaf() {
+		var code string
+		for _, s := range steps {
+			code += strconv.Itoa(s)
 		}
+		mapCode[root.char] = code
+		return
 	}
 
-	return ci
+	if root.left != nil {
+		steps = append(steps, 0)
+		fillMapCode(*root.left, steps, mapCode)
+	}
+
+	if root.right != nil {
+		steps = append(steps[:len(steps)-1], 1)
+		fillMapCode(*root.right, steps, mapCode)
+	}
 }
 
-func iteration(nodes []node) []node {
-	lfi1 := findLowestFreq(nodes)
-	lfn1 := nodes[lfi1]
+func CreateHuffmanMapCodeFromString(s string) map[rune]string {
+	nodes := makeNodes(s)
 
-	nodes = removeAtIndex(nodes, lfi1)
+	for len(nodes) > 1 {
+		nodes = iteration(nodes)
+	}
 
-	lfi2 := findLowestFreq(nodes)
-	lfn2 := nodes[lfi2]
+	mapCode := make(map[rune]string)
 
-	nodes = removeAtIndex(nodes, lfi2)
+	fillMapCode(nodes[0], []int{}, mapCode)
 
-	iNode := newInternalNode(lfn1, lfn2)
-
-	nodes = append(nodes, iNode)
-
-	return nodes
+	return mapCode
 }
 
-func CreateHuffmanCodeFromString(s string) {
+func PrintHuffmanCodeFromString(s string) {
 	nodes := makeNodes(s)
 
 	for len(nodes) > 1 {
@@ -106,4 +97,57 @@ func CreateHuffmanCodeFromString(s string) {
 	}
 
 	printCode(nodes[0], []int{})
+}
+
+func decode(treeRoot *node, encodedData []byte, ol int) string {
+	var decodedData string
+
+	ref := treeRoot
+	leafCount := 0
+
+begin:
+	for _, bytes := range encodedData {
+		bitStr := fmt.Sprintf("%08b", bytes)
+
+		for _, rune := range bitStr {
+			if ref.isLeaf() {
+				leafCount++
+				decodedData += string(ref.char)
+
+				if leafCount == ol {
+					break begin
+				}
+
+				ref = treeRoot
+			}
+			switch rune {
+			case '0':
+				if ref.left != nil {
+					ref = ref.left
+				}
+			case '1':
+				if ref.right != nil {
+					ref = ref.right
+				}
+			}
+		}
+	}
+
+	return decodedData
+}
+
+func DecodeHuffmanFromMapCode(mapCode map[rune]string, bs []byte, ol int) string {
+	root := makeTreeFromCodeMap(mapCode)
+
+	decodeString := decode(root, bs, ol)
+
+	return decodeString
+}
+
+func PrintDecodeHuffmanFromMapCode(mapCode map[rune]string, bs []byte, ol int) {
+	root := makeTreeFromCodeMap(mapCode)
+
+	decodeString := decode(root, bs, ol)
+
+	fmt.Printf("%v\n", decodeString)
 }

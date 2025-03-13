@@ -72,7 +72,7 @@ func removeAtIndex(nodes []node, index int) []node {
 }
 
 func makeTreeFromCodeMap(codeMap map[rune]string) *node {
-	root := node{}
+	root := &node{}
 
 	for k, v := range codeMap {
 		reference := root
@@ -91,7 +91,7 @@ func makeTreeFromCodeMap(codeMap map[rune]string) *node {
 				if reference.left == nil {
 					reference.left = &node{}
 				}
-				reference = *reference.left
+				reference = reference.left
 				continue
 			}
 
@@ -99,11 +99,11 @@ func makeTreeFromCodeMap(codeMap map[rune]string) *node {
 				if reference.right == nil {
 					reference.right = &node{}
 				}
-				reference = *reference.right
+				reference = reference.right
 				continue
 			}
 		}
 	}
 
-	return &root
+	return root
 }

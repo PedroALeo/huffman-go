@@ -12,8 +12,6 @@ func CompressWithMapCode(mapCode map[rune]string, originalString string) ([]byte
 		strEncodedString += mapCode[rune]
 	}
 
-	println(strEncodedString)
-
 	encodedStr := binaryStringToByteSlice(strEncodedString)
 
 	return encodedStr, len(originalString)

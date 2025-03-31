@@ -18,7 +18,7 @@ func binaryStringToByteSlice(binaryString string) []byte {
 		binaryString = binaryString[8:]
 		if len(binaryString) < 8 {
 			left := 8 - len(binaryString)
-			for left > 8 {
+			for left > 0 {
 				binaryString += "0"
 				left--
 			}
